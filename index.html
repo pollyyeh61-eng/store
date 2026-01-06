@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUXE Inventory | 奢華庫存自動化系統</title>
+    <title>黑金庫存自動化系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
@@ -122,8 +122,7 @@
 <body>
 
 <div id="app" class="min-h-screen flex flex-col p-8">
-    <header class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-        <h1 class="text-4xl gold-text font-bold tracking-tighter">LUXE INVENTORY</h1>
+    <header class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">庫存管理<h1 class="text-4xl gold-text font-bold tracking-tighter">h11
         <div class="flex items-center gap-8">
             <nav class="space-x-8 text-xs uppercase">
                 <button @click="page = 1" :class="{active: page === 1}">資料輸入</button>
@@ -326,7 +325,8 @@
                     return;
                 }
 
-                const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+                // 在內容前面加上 \ufeff (這是 UTF-8 的 BOM 標頭)
+                const blob = new Blob(["\ufeff" + content], { type: "text/plain;charset=utf-8" });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
@@ -341,3 +341,4 @@
 
 </body>
 </html>
+
