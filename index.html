@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXE Inventory | 奢華庫存管理系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark-gold: #926f34;
+            --black: #050505;
+            --card-bg: rgba(20, 20, 20, 0.8);
+        }
+
+        body {
+            background-color: var(--black);
+            color: #e0e0e0;
+            font-family: 'Noto Sans TC', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* 流金字體效果 */
+        .gold-text {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        /* 呼吸感卡片 */
+        .luxury-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            animation: breathe 5s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0%, 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.05); border-color: rgba(212, 175, 55, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.5); }
+        }
+
+        /* 滑鼠點過/經過的反光效果 */
+        .luxury-card::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 100%;
+            height: 300%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0s;
+            transform: rotate(45deg);
+        }
+
+        .luxury-card:hover::after {
+            left: 150%;
+            transition: 0.8s;
+        }
+
+        .luxury-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+        }
+
+        /* 金色按鈕 */
+        .gold-btn {
+            background: linear-gradient(135deg, #b38728, #fcf6ba);
+            color: #000;
+            font-weight: bold;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .gold-btn:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 0 15px var(--gold);
+        }
+
+        /* 導覽列 */
+        nav button {
+            transition: 0.3s;
+            position: relative;
+        }
+        nav button.active {
+            color: var(--gold);
+        }
+        nav button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        input, select {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(212, 175, 55, 0.3) !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app" class="min-h-screen flex flex-col p-6">
+    <header class="flex justify-between items-center mb-10">
+        <h1 class="text-3xl gold-text font-bold">LUXE INVENTORY</h1>
+        <nav class="space-x-8 text-sm tracking-widest uppercase">
+            <button @click="page = 1" :class="{active: page === 1}">資料輸入</button>
+            <button @click="page = 2" :class="{active: page === 2}">倉庫抽屜</button>
+            <button @click="page = 3" :class="{active: page === 3}">營運建議</button>
+        </nav>
+    </header>
+
+    <main class="flex-grow">
+        <section v-if="page === 1" class="max-w-2xl mx-auto">
+            <div class="luxury-card p-8 rounded-lg">
+                <h2 class="text-xl gold-text mb-6">新增管理物件</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs mb-1 opacity-60">物品名稱 (如: 染劑-藍黑, 糖包)</label>
+                        <input v-model="newItem.name" type="text" class="w-full p-3 rounded">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs mb-1 opacity-60">分類</label>
+                            <select v-model="newItem.category" class="w-full p-3 rounded">
+                                <option value="藥劑">藥劑/染劑</option>
+                                <option value="耗材">生活耗材</option>
+                                <option value="客供">客供品</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs mb-1 opacity-60">當前庫存量</label>
+                            <input v-model.number="newItem.stock" type="number" class="w-full p-3 rounded">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs mb-1 opacity-60">安全庫存警戒值</label>
+                        <input v-model.number="newItem.safeValue" type="number" class="w-full p-3 rounded">
+                    </div>
+                    <button @click="addItem" class="gold-btn w-full py-3 mt-4 rounded uppercase tracking-widest">存入資料庫</button>
+                </div>
+            </div>
+        </section>
+
+        <section v-if="page === 2">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div v-for="item in items" :key="item.id" class="luxury-card p-6 rounded-xl flex flex-col justify-between h-48">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <span class="text-[10px] px-2 py-1 border border-gold/30 rounded text-gold">{{ item.category }}</span>
+                            <span v-if="item.stock <= item.safeValue" class="text-red-500 text-[10px] animate-pulse">LOW STOCK</span>
+                        </div>
+                        <h3 class="text-lg mt-3 font-medium">{{ item.name }}</h3>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <div class="text-3xl font-light">{{ item.stock }}<span class="text-xs opacity-50 ml-1">PCS</span></div>
+                        <div class="flex space-x-2">
+                            <button @click="updateStock(item, -1)" class="w-8 h-8 rounded-full border border-gold/50 flex items-center justify-center hover:bg-gold/20">-</button>
+                            <button @click="updateStock(item, 1)" class="w-8 h-8 rounded-full border border-gold/50 flex items-center justify-center hover:bg-gold/20">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section v-if="page === 3" class="max-w-4xl mx-auto space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="luxury-card p-6 rounded-lg border-red-900/30">
+                    <h3 class="gold-text text-lg mb-4">🚨 補貨警戒</h3>
+                    <ul class="space-y-3">
+                        <li v-for="i in lowStockItems" :key="i.id" class="flex justify-between text-sm">
+                            <span>{{ i.name }}</span>
+                            <span class="text-red-400">尚餘 {{ i.stock }} (缺 {{ i.safeValue - i.stock + 1 }})</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="luxury-card p-6 rounded-lg">
+                    <h3 class="gold-text text-lg mb-4">💎 優化建議</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li v-for="i in overStockItems" :key="i.id" class="flex justify-between">
+                            <span>{{ i.name }}</span>
+                            <span class="text-green-400">周轉緩慢 (庫存 {{ i.stock }})</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="luxury-card p-6 rounded-lg mt-10">
+                <h3 class="gold-text text-lg mb-4">📊 今日收工結算 (模擬)</h3>
+                <div class="grid grid-cols-3 text-center">
+                    <div>
+                        <p class="text-xs opacity-50">預估業績</p>
+                        <p class="text-2xl gold-text">$12,800</p>
+                    </div>
+                    <div>
+                        <p class="text-xs opacity-50">客單價</p>
+                        <p class="text-2xl gold-text">$2,560</p>
+                    </div>
+                    <div>
+                        <p class="text-xs opacity-50">產品銷售比</p>
+                        <p class="text-2xl gold-text">18.5%</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-10 text-center text-[10px] opacity-30 tracking-widest">
+        © 2024 LUXE SYSTEM - PRESTIGE MANAGEMENT
+    </footer>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // --- 請在此替換你的 Firebase 設定 ---
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const { createApp, ref, computed, onMounted } = Vue;
+
+    createApp({
+        setup() {
+            const page = ref(1);
+            const items = ref([]);
+            const newItem = ref({ name: '', category: '藥劑', stock: 0, safeValue: 5 });
+
+            // 實時監聽資料庫
+            onMounted(() => {
+                const q = query(collection(db, "inventory"));
+                onSnapshot(q, (snapshot) => {
+                    items.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                });
+            });
+
+            const addItem = async () => {
+                if (!newItem.value.name) return;
+                await addDoc(collection(db, "inventory"), newItem.value);
+                newItem.value = { name: '', category: '藥劑', stock: 0, safeValue: 5 };
+                alert("品項已存入金庫");
+            };
+
+            const updateStock = async (item, change) => {
+                const itemRef = doc(db, "inventory", item.id);
+                const newStock = Math.max(0, item.stock + change);
+                await updateDoc(itemRef, { stock: newStock });
+            };
+
+            const lowStockItems = computed(() => items.value.filter(i => i.stock <= i.safeValue));
+            const overStockItems = computed(() => items.value.filter(i => i.stock > i.safeValue * 3));
+
+            return { page, items, newItem, addItem, updateStock, lowStockItems, overStockItems };
+        }
+    }).mount('#app');
+</script>
+
+</body>
+</html>
