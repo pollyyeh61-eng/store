@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>黑金庫存自動化系統</title>
+    <title>LUXE Inventory | 奢華庫存自動化系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
@@ -11,246 +11,213 @@
     <style>
         :root {
             --gold: #d4af37;
+            --light-gold: #fcf6ba;
             --dark-gold: #926f34;
             --black: #050505;
-            --card-bg: rgba(20, 20, 20, 0.8);
         }
 
         body {
             background-color: var(--black);
             color: #e0e0e0;
             font-family: 'Noto Sans TC', sans-serif;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+            background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
+            min-height: 100vh;
         }
 
-        /* 流金字體效果 */
         .gold-text {
             font-family: 'Cinzel', serif;
             background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
 
-        /* 呼吸感卡片 */
+        /* 精緻化按鈕設計 */
+        .nav-btn {
+            position: relative;
+            padding: 10px 20px;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            letter-spacing: 2px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            overflow: hidden;
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%; width: 0; height: 1px;
+            background: var(--gold);
+            transition: all 0.4s ease;
+        }
+
+        .nav-btn:hover {
+            color: var(--light-gold);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .nav-btn.active {
+            color: var(--gold);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.1);
+        }
+
+        .nav-btn.active::before { width: 100%; left: 0; }
+
+        /* 呼吸感卡片與反光 */
         .luxury-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            backdrop-filter: blur(15px);
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
             transition: all 0.5s ease;
-            animation: breathe 5s infinite ease-in-out;
+            animation: breathe 6s infinite ease-in-out;
         }
 
         @keyframes breathe {
-            0%, 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.05); border-color: rgba(212, 175, 55, 0.2); }
-            50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.5); }
+            0%, 100% { box-shadow: 0 0 15px rgba(0,0,0,0.5); border-color: rgba(212, 175, 55, 0.15); }
+            50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.1); border-color: rgba(212, 175, 55, 0.4); }
         }
 
-        /* 滑鼠經過的反光效果 */
         .luxury-card::after {
             content: '';
             position: absolute;
-            top: -100%;
-            left: -100%;
-            width: 100%;
-            height: 300%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-            transition: 0s;
+            top: -150%; left: -150%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.08), transparent);
             transform: rotate(45deg);
             pointer-events: none;
         }
 
         .luxury-card:hover::after {
-            left: 150%;
+            left: 150%; top: 150%;
             transition: 0.8s;
         }
 
-        .luxury-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--gold);
-        }
-
-        /* 按鈕設計 */
-        .gold-btn {
-            background: linear-gradient(135deg, #b38728, #fcf6ba);
-            color: #000;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .gold-btn:hover {
-            filter: brightness(1.2);
-            box-shadow: 0 0 20px var(--gold);
-        }
-
-        nav button {
-            transition: 0.3s;
-            position: relative;
-            letter-spacing: 0.15em;
-        }
-        nav button.active {
-            color: var(--gold);
-            text-shadow: 0 0 8px var(--gold);
-        }
-        nav button.active::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: var(--gold);
-        }
-
+        /* 輸入框美化 */
         input, select {
-            background: rgba(255,255,255,0.03) !important;
+            background: rgba(0,0,0,0.4) !important;
             border: 1px solid rgba(212, 175, 55, 0.2) !important;
-            color: white !important;
-            outline: none;
+            color: #fff !important;
+            transition: 0.3s;
         }
-        input:focus { border-color: var(--gold) !important; }
+        input:focus { border-color: var(--gold) !important; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
 
-        /* 捲軸美化 */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: var(--dark-gold); }
+        .gold-btn-main {
+            background: linear-gradient(135deg, #b38728, #fcf6ba, #aa771c);
+            color: #000;
+            font-weight: 700;
+            letter-spacing: 4px;
+            transition: 0.4s;
+        }
+        .gold-btn-main:hover { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+
+        /* 隱藏捲軸 */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--dark-gold); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div id="app" class="min-h-screen flex flex-col p-8">
-    <header class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">庫存管理<h1 class="text-4xl gold-text font-bold tracking-tighter">h11
-        <div class="flex items-center gap-8">
-            <nav class="space-x-8 text-xs uppercase">
-                <button @click="page = 1" :class="{active: page === 1}">資料輸入</button>
-                <button @click="page = 2" :class="{active: page === 2}">倉庫抽屜</button>
-                <button @click="page = 3" :class="{active: page === 3}">營運建議</button>
+<div id="app" class="p-6 md:p-12">
+    <header class="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
+        <h1 class="text-4xl gold-text font-bold tracking-[0.2em]">LUXE INVENTORY</h1>
+        <div class="flex items-center gap-4">
+            <nav class="flex gap-2">
+                <button @click="page = 1" :class="['nav-btn', {active: page === 1}]">資料輸入</button>
+                <button @click="page = 2" :class="['nav-btn', {active: page === 2}]">倉庫抽屜</button>
+                <button @click="page = 3" :class="['nav-btn', {active: page === 3}]">營運建議</button>
             </nav>
-            <button @click="downloadReport" class="border border-gold/40 px-4 py-2 text-[10px] text-gold hover:bg-gold hover:text-black transition-all tracking-[0.2em]">
-                EXPORT REPORT
+            <button @click="downloadCombinedReport" class="ml-4 px-6 py-2 border border-gold text-[10px] text-gold hover:bg-gold hover:text-black transition-all tracking-[2px]">
+                MERGED REPORT
             </button>
         </div>
     </header>
 
-    <main class="flex-grow">
-        <section v-if="page === 1" class="max-w-xl mx-auto animate-fadeIn">
-            <div class="luxury-card p-10 rounded-2xl">
-                <h2 class="text-2xl gold-text mb-8 text-center font-bold">物品建檔</h2>
-                <div class="space-y-6">
+    <main>
+        <section v-if="page === 1" class="max-w-xl mx-auto">
+            <div class="luxury-card p-10 rounded-3xl border-t-2 border-t-gold/50">
+                <h2 class="text-xl gold-text mb-8 tracking-[5px] text-center">ITEM REGISTRATION</h2>
+                <div class="space-y-6 text-sm">
                     <div>
-                        <label class="block text-[10px] uppercase tracking-widest mb-2 opacity-50">物品名稱</label>
-                        <input v-model="newItem.name" type="text" placeholder="例如：染膏-7.1 或 伯爵茶包" class="w-full p-4 rounded-lg">
+                        <label class="block opacity-40 mb-2">物品名稱 / Name</label>
+                        <input v-model="newItem.name" type="text" class="w-full p-4 rounded-xl">
                     </div>
                     <div class="grid grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[10px] uppercase tracking-widest mb-2 opacity-50">類別</label>
-                            <select v-model="newItem.category" class="w-full p-4 rounded-lg">
-                                <option value="藥劑">藥劑 / 染劑</option>
-                                <option value="耗材">生活耗材</option>
-                                <option value="客供">奢華客供品</option>
+                            <label class="block opacity-40 mb-2">類別 / Category</label>
+                            <select v-model="newItem.category" class="w-full p-4 rounded-xl">
+                                <option value="藥劑">藥劑/染劑</option>
+                                <option value="耗材">備品耗材</option>
+                                <option value="奢華">精品客供</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] uppercase tracking-widest mb-2 opacity-50">當前庫存</label>
-                            <input v-model.number="newItem.stock" type="number" class="w-full p-4 rounded-lg">
+                            <label class="block opacity-40 mb-2">當前存量</label>
+                            <input v-model.number="newItem.stock" type="number" class="w-full p-4 rounded-xl">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase tracking-widest mb-2 opacity-50">安全水位 (自動預警值)</label>
-                        <input v-model.number="newItem.safeValue" type="number" class="w-full p-4 rounded-lg">
+                        <label class="block opacity-40 mb-2">安全水位 / Safety Line</label>
+                        <input v-model.number="newItem.safeValue" type="number" class="w-full p-4 rounded-xl">
                     </div>
-                    <button @click="addItem" class="gold-btn w-full py-4 mt-6 rounded-lg uppercase tracking-[0.3em] text-sm">存入金庫資料庫</button>
+                    <button @click="addItem" class="gold-btn-main w-full py-5 mt-4 rounded-xl">存入金庫系統</button>
                 </div>
             </div>
         </section>
 
-        <section v-if="page === 2" class="animate-fadeIn">
+        <section v-if="page === 2">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div v-for="item in items" :key="item.id" class="luxury-card p-6 rounded-2xl flex flex-col justify-between h-56">
+                <div v-for="item in items" :key="item.id" class="luxury-card p-6 rounded-2xl h-60 flex flex-col justify-between">
                     <div>
-                        <div class="flex justify-between items-start">
-                            <span class="text-[9px] tracking-widest px-3 py-1 border border-gold/20 rounded-full text-gold bg-gold/5">{{ item.category }}</span>
-                            <span v-if="item.stock <= item.safeValue" class="text-red-500 text-[10px] font-bold tracking-tighter animate-pulse">LOW STOCK</span>
+                        <div class="flex justify-between">
+                            <span class="text-[9px] text-gold border border-gold/30 px-2 py-1 rounded">{{ item.category }}</span>
+                            <span v-if="item.stock <= item.safeValue" class="text-red-500 text-[9px] font-bold animate-pulse">REFILL NEEDED</span>
                         </div>
-                        <h3 class="text-xl mt-4 font-light tracking-wide">{{ item.name }}</h3>
+                        <h3 class="text-xl mt-4 tracking-wider">{{ item.name }}</h3>
                     </div>
                     <div class="flex justify-between items-end">
-                        <div class="flex flex-col">
-                            <span class="text-[10px] opacity-40 uppercase tracking-tighter">Current Volume</span>
-                            <div class="text-4xl font-extralight text-white">{{ item.stock }}<span class="text-xs opacity-30 ml-1">PCS</span></div>
-                        </div>
-                        <div class="flex gap-3 mb-1">
-                            <button @click="updateStock(item, -1)" class="w-10 h-10 rounded-lg border border-gold/30 flex items-center justify-center hover:bg-gold hover:text-black transition-all">－</button>
-                            <button @click="updateStock(item, 1)" class="w-10 h-10 rounded-lg border border-gold/30 flex items-center justify-center hover:bg-gold hover:text-black transition-all">＋</button>
+                        <div class="text-4xl font-light text-white">{{ item.stock }}<span class="text-xs opacity-30 ml-1">UNITS</span></div>
+                        <div class="flex gap-2">
+                            <button @click="updateStock(item, -1)" class="w-10 h-10 border border-gold/30 rounded-lg hover:bg-gold hover:text-black transition-all">－</button>
+                            <button @click="updateStock(item, 1)" class="w-10 h-10 border border-gold/30 rounded-lg hover:bg-gold hover:text-black transition-all">＋</button>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section v-if="page === 3" class="max-w-5xl mx-auto space-y-8 animate-fadeIn">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="luxury-card p-8 rounded-2xl border-l-4 border-l-red-800">
-                    <h3 class="gold-text text-xl mb-6 font-bold uppercase tracking-widest">🚨 補貨清單通知</h3>
-                    <div class="space-y-4 max-h-64 overflow-y-auto pr-2">
-                        <div v-for="i in lowStockItems" :key="i.id" class="flex justify-between items-center border-b border-white/5 pb-2">
-                            <div>
-                                <p class="text-sm">{{ i.name }}</p>
-                                <p class="text-[10px] opacity-40">安全值: {{ i.safeValue }}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-red-400 font-bold">尚餘 {{ i.stock }}</p>
-                                <p class="text-[10px] text-gold/60">建議補貨量: {{ i.safeValue - i.stock + 5 }}</p>
-                            </div>
+        <section v-if="page === 3" class="max-w-6xl mx-auto space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div v-for="type in reportLogic" :key="type.title" class="luxury-card p-6 rounded-2xl border-t-4" :style="{borderColor: type.color}">
+                    <h4 class="text-xs font-bold mb-4" :style="{color: type.color}">{{ type.title }}</h4>
+                    <div class="space-y-2 h-40 overflow-y-auto pr-2">
+                        <div v-for="i in type.list" :key="i.id" class="flex justify-between text-xs border-b border-white/5 pb-2">
+                            <span>{{ i.name }}</span>
+                            <span class="opacity-60">{{ i.stock }}件</span>
                         </div>
-                        <p v-if="lowStockItems.length === 0" class="text-xs opacity-40 italic">目前庫存水位一切正常</p>
                     </div>
-                </div>
-                <div class="luxury-card p-8 rounded-2xl">
-                    <h3 class="gold-text text-xl mb-6 font-bold uppercase tracking-widest">💎 庫存優化建議</h3>
-                    <div class="space-y-4">
-                        <div v-for="i in overStockItems" :key="i.id" class="flex justify-between items-center border-b border-white/5 pb-2">
-                            <span class="text-sm">{{ i.name }}</span>
-                            <span class="text-[11px] text-green-400 bg-green-400/10 px-2 py-1 rounded">建議舉辦促銷活動</span>
-                        </div>
-                        <p v-if="overStockItems.length === 0" class="text-xs opacity-40 italic">尚無庫存積壓品項</p>
-                    </div>
+                    <p class="mt-4 text-[10px] opacity-50 italic">建議：{{ type.advice }}</p>
                 </div>
             </div>
             
-            <div class="luxury-card p-10 rounded-2xl">
-                <h3 class="gold-text text-xl mb-8 font-bold text-center uppercase tracking-[0.5em]">Daily Business Abstract</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-                    <div>
-                        <p class="text-[10px] opacity-40 uppercase mb-2 tracking-[0.2em]">預估當日營收</p>
-                        <p class="text-4xl font-light gold-text">$12,800</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] opacity-40 uppercase mb-2 tracking-[0.2em]">平均客單價</p>
-                        <p class="text-4xl font-light gold-text">$2,560</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] opacity-40 uppercase mb-2 tracking-[0.2em]">產品轉換率</p>
-                        <p class="text-4xl font-light gold-text">18.5%</p>
-                    </div>
+            <div class="luxury-card p-10 rounded-3xl text-center">
+                <h3 class="gold-text text-xl mb-6 tracking-[8px]">BUSINESS ANALYSIS</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div><p class="text-[10px] opacity-40 mb-1">今日總額</p><p class="text-2xl gold-text font-bold">$12,800</p></div>
+                    <div><p class="text-[10px] opacity-40 mb-1">客單分析</p><p class="text-2xl gold-text font-bold">$2,560</p></div>
+                    <div><p class="text-[10px] opacity-40 mb-1">銷售佔比</p><p class="text-2xl gold-text font-bold">18.5%</p></div>
                 </div>
             </div>
         </section>
     </main>
-
-    <footer class="mt-16 text-center">
-        <p class="text-[10px] opacity-20 tracking-[0.5em] uppercase">Private & Confidential - Luxe Management System</p>
-    </footer>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- 請在此處填入您的 Firebase 設定 ---
     const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -262,83 +229,78 @@
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
-
     const { createApp, ref, computed, onMounted } = Vue;
 
     createApp({
         setup() {
-            const page = ref(2); // 預設顯示倉庫
+            const page = ref(2);
             const items = ref([]);
             const newItem = ref({ name: '', category: '藥劑', stock: 0, safeValue: 5 });
 
-            // 實時監聽資料庫
             onMounted(() => {
-                const q = query(collection(db, "inventory"));
-                onSnapshot(q, (snapshot) => {
-                    items.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                onSnapshot(query(collection(db, "inventory")), (snap) => {
+                    items.value = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 });
             });
 
             const addItem = async () => {
-                if (!newItem.value.name) return alert("請輸入物品名稱");
+                if (!newItem.value.name) return;
                 await addDoc(collection(db, "inventory"), newItem.value);
                 newItem.value = { name: '', category: '藥劑', stock: 0, safeValue: 5 };
-                alert("已成功收納至金庫");
+                alert("物品已安全存入庫存系統");
             };
 
             const updateStock = async (item, change) => {
-                const itemRef = doc(db, "inventory", item.id);
-                const newStock = Math.max(0, item.stock + change);
-                await updateDoc(itemRef, { stock: newStock });
+                await updateDoc(doc(db, "inventory", item.id), { stock: Math.max(0, item.stock + change) });
             };
 
-            const lowStockItems = computed(() => items.value.filter(i => i.stock <= i.safeValue));
-            const overStockItems = computed(() => items.value.filter(i => i.stock > i.safeValue * 3));
+            // 營運邏輯
+            const reportLogic = computed(() => [
+                { title: '🆘 不足量補貨', color: '#ff4d4d', advice: '請儘快補貨，避免斷貨風險。', 
+                  list: items.value.filter(i => i.stock <= i.safeValue) },
+                { title: '✅ 均量保持', color: '#d4af37', advice: '現狀良好，暫無需變動。', 
+                  list: items.value.filter(i => i.stock > i.safeValue && i.stock <= i.safeValue * 2) },
+                { title: '📈 主力推薦', color: '#4da6ff', advice: '過量一倍，建議列為本週主力推薦品項。', 
+                  list: items.value.filter(i => i.stock > i.safeValue * 2 && i.stock <= i.safeValue * 3) },
+                { title: '🔥 促銷處理', color: '#ff944d', advice: '過量二倍以上，建議立即執行促銷活動。', 
+                  list: items.value.filter(i => i.stock > i.safeValue * 3) }
+            ]);
 
-            // 下載報表功能
-            const downloadReport = () => {
-                let content = "";
-                const dateStr = new Date().toLocaleString();
+            const downloadCombinedReport = () => {
+                const now = new Date();
+                let content = `【 LUXE MANAGEMENT - 綜合營運庫存月結報告 】\n`;
+                content += `產出時間: ${now.toLocaleString()}\n${'='.repeat(60)}\n\n`;
 
-                if (page.value === 2) {
-                    content = `【 LUXE SYSTEM - 全球庫存盤點表 】\n導出時間: ${dateStr}\n${'='.repeat(50)}\n\n`;
-                    items.value.forEach(i => {
-                        const status = i.stock <= i.safeValue ? "!! 補貨警戒 !!" : "庫存充足";
-                        content += `品名: ${i.name.padEnd(20)} | 分類: ${i.category} | 數量: ${i.stock} | 狀態: ${status}\n`;
-                    });
-                } else if (page.value === 3) {
-                    content = `【 LUXE SYSTEM - 營運分析建議報告 】\n報告產出: ${dateStr}\n${'='.repeat(50)}\n\n`;
-                    content += `一、 🚨 緊急補貨清單：\n`;
-                    lowStockItems.value.forEach(i => {
-                        content += `   - ${i.name}: 剩餘 ${i.stock} (低於安全水位 ${i.safeValue})，建議立即補貨 ${i.safeValue - i.stock + 5} 單位。\n`;
-                    });
-                    if(lowStockItems.value.length === 0) content += "   目前無缺貨品項。\n";
+                content += `[ 第一部分：全庫存狀態清冊 ]\n`;
+                items.value.forEach(i => {
+                    content += `- ${i.name.padEnd(15)} | 分類: ${i.category} | 當前庫存: ${i.stock} | 安全水位: ${i.safeValue}\n`;
+                });
 
-                    content += `\n二、 💎 庫存周轉優化建議：\n`;
-                    overStockItems.value.forEach(i => {
-                        content += `   - ${i.name}: 現有庫存 ${i.stock} 件，屬於高積壓品項，建議結合促銷方案。\n`;
-                    });
-                    
-                    content += `\n三、 📊 今日結算摘要：\n   - 預估業績: $12,800\n   - 平均客單價: $2,560\n   - 產品轉換率: 18.5%\n`;
-                } else {
-                    alert("請切換至「倉庫抽屜」或「營運建議」頁面來下載對應報表。");
-                    return;
-                }
+                content += `\n\n[ 第二部分：營運階梯建議報告 ]\n`;
+                reportLogic.value.forEach(type => {
+                    content += `\n▶ ${type.title} (共 ${type.list.length} 項)\n`;
+                    content += `建議方針：${type.advice}\n`;
+                    type.list.forEach(i => content += `   - ${i.name} (庫存:${i.stock})\n`);
+                });
 
-                // 在內容前面加上 \ufeff (這是 UTF-8 的 BOM 標頭)
+                content += `\n\n[ 第三部分：每日結算模擬資料 ]\n`;
+                content += `- 今日預估業績: $12,800\n- 平均客單價: $2,560\n- 產品銷售比例: 18.5%\n`;
+                content += `\n${'='.repeat(60)}\nLUXE INVENTORY SYSTEM - 尊爵版`;
+
+                // 修正亂碼：加上 BOM (\ufeff)
                 const blob = new Blob(["\ufeff" + content], { type: "text/plain;charset=utf-8" });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `Luxe_Report_${new Date().getTime()}.txt`;
+                a.download = `LUXE_Full_Report_${now.getTime()}.txt`;
                 a.click();
+                URL.revokeObjectURL(url);
             };
 
-            return { page, items, newItem, addItem, updateStock, lowStockItems, overStockItems, downloadReport };
+            return { page, items, newItem, addItem, updateStock, reportLogic, downloadCombinedReport };
         }
     }).mount('#app');
 </script>
 
 </body>
 </html>
-
