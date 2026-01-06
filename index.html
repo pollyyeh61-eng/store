@@ -2,7 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">黑金庫存管理<title>titlev
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXE Inventory | 黑金奢華庫存管理</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
@@ -21,6 +22,7 @@
             font-family: 'Noto Sans TC', sans-serif;
             background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
             min-height: 100vh;
+            margin: 0;
         }
 
         .gold-text {
@@ -40,6 +42,8 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid transparent;
             overflow: hidden;
+            background: none;
+            cursor: pointer;
         }
         
         .nav-btn::before {
@@ -100,6 +104,7 @@
             border: 1px solid rgba(212, 175, 55, 0.2) !important;
             color: #fff !important;
             transition: 0.3s;
+            outline: none;
         }
         input:focus { border-color: var(--gold) !important; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
 
@@ -109,6 +114,8 @@
             font-weight: 700;
             letter-spacing: 4px;
             transition: 0.4s;
+            cursor: pointer;
+            border: none;
         }
         .gold-btn-main:hover { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
 
@@ -120,15 +127,15 @@
 <body>
 
 <div id="app" class="p-6 md:p-12">
-    <header class="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
-        <h1 class="text-4xl gold-text font-bold tracking-[0.2em]">黑金庫存管理 </h1>
-        <div class="flex items-center gap-4">
+    <header class="flex flex-col md:flex-row justify-between items-center mb-16 gap-8 text-center md:text-left">
+        <h1 class="text-4xl gold-text font-bold tracking-[0.2em]">LUXE INVENTORY</h1>
+        <div class="flex items-center gap-4 flex-wrap justify-center">
             <nav class="flex gap-2">
                 <button @click="page = 1" :class="['nav-btn', {active: page === 1}]">資料輸入</button>
                 <button @click="page = 2" :class="['nav-btn', {active: page === 2}]">倉庫抽屜</button>
                 <button @click="page = 3" :class="['nav-btn', {active: page === 3}]">營運建議</button>
             </nav>
-            <button @click="downloadCombinedReport" class="ml-4 px-6 py-2 border border-gold text-[10px] text-gold hover:bg-gold hover:text-black transition-all tracking-[2px]">
+            <button @click="downloadCombinedReport" class="px-6 py-2 border border-gold text-[10px] text-gold hover:bg-gold hover:text-black transition-all tracking-[2px] bg-transparent cursor-pointer">
                 MERGED REPORT
             </button>
         </div>
@@ -179,8 +186,8 @@
                     <div class="flex justify-between items-end">
                         <div class="text-4xl font-light text-white">{{ item.stock }}<span class="text-xs opacity-30 ml-1">UNITS</span></div>
                         <div class="flex gap-2">
-                            <button @click="updateStock(item, -1)" class="w-10 h-10 border border-gold/30 rounded-lg hover:bg-gold hover:text-black transition-all">－</button>
-                            <button @click="updateStock(item, 1)" class="w-10 h-10 border border-gold/30 rounded-lg hover:bg-gold hover:text-black transition-all">＋</button>
+                            <button @click="updateStock(item, -1)" class="w-10 h-10 border border-gold/30 rounded-lg hover:bg-gold hover:text-black transition-all bg-transparent cursor-pointer">－</button>
+                            <button @click="updateStock(item, 1)" class="w-10 h-10 border border-gold/30 rounded-lg hover:bg-gold hover:text-black transition-all bg-transparent cursor-pointer">＋</button>
                         </div>
                     </div>
                 </div>
@@ -217,6 +224,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // --- 請記得替換成你的 Firebase 設定 ---
     const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -243,17 +251,20 @@
             });
 
             const addItem = async () => {
-                if (!newItem.value.name) return;
+                if (!newItem.value.name) {
+                    alert("請輸入名稱");
+                    return;
+                }
                 await addDoc(collection(db, "inventory"), newItem.value);
                 newItem.value = { name: '', category: '藥劑', stock: 0, safeValue: 5 };
                 alert("物品已安全存入庫存系統");
             };
 
             const updateStock = async (item, change) => {
-                await updateDoc(doc(db, "inventory", item.id), { stock: Math.max(0, item.stock + change) });
+                const newStock = Math.max(0, item.stock + change);
+                await updateDoc(doc(db, "inventory", item.id), { stock: newStock });
             };
 
-            // 營運邏輯
             const reportLogic = computed(() => [
                 { title: '🆘 不足量補貨', color: '#ff4d4d', advice: '請儘快補貨，避免斷貨風險。', 
                   list: items.value.filter(i => i.stock <= i.safeValue) },
@@ -282,18 +293,14 @@
                     type.list.forEach(i => content += `   - ${i.name} (庫存:${i.stock})\n`);
                 });
 
-                content += `\n\n[ 第三部分：每日結算模擬資料 ]\n`;
-                content += `- 今日預估業績: $12,800\n- 平均客單價: $2,560\n- 產品銷售比例: 18.5%\n`;
-                content += `\n${'='.repeat(60)}\nLUXE INVENTORY SYSTEM - 尊爵版`;
-
-                // 修正亂碼：加上 BOM (\ufeff)
+                content += `\n\n[ 第三部分：每日結算摘要 ]\n- 今日預估業績: $12,800\n- 平均客單價: $2,560\n- 產品銷售比例: 18.5%\n`;
+                
                 const blob = new Blob(["\ufeff" + content], { type: "text/plain;charset=utf-8" });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
                 a.download = `LUXE_Full_Report_${now.getTime()}.txt`;
                 a.click();
-                URL.revokeObjectURL(url);
             };
 
             return { page, items, newItem, addItem, updateStock, reportLogic, downloadCombinedReport };
@@ -303,4 +310,3 @@
 
 </body>
 </html>
-
